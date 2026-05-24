@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Moving Day Countdown</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f7f4ee;
+        --ink: #24211d;
+        --muted: #6f665c;
+        --accent: #2f6f64;
+        --accent-dark: #214f48;
+        --surface: #fffdf8;
+        --line: #ded6c9;
+        --shadow: 0 22px 60px rgba(41, 35, 25, 0.14);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background:
+          radial-gradient(circle at top left, rgba(47, 111, 100, 0.18), transparent 32rem),
+          linear-gradient(135deg, #f7f4ee 0%, #ece4d6 100%);
+        color: var(--ink);
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      main {
+        width: min(100%, 560px);
+        text-align: center;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        padding: clamp(28px, 8vw, 56px);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(34px, 9vw, 64px);
+        line-height: 1.02;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        margin: 0 auto 28px;
+        max-width: 30rem;
+        color: var(--muted);
+        font-size: clamp(17px, 4vw, 21px);
+        line-height: 1.45;
+      }
+
+      .days {
+        display: grid;
+        gap: 8px;
+        margin: 0 0 26px;
+        padding: 28px 18px;
+        border-radius: 8px;
+        background: #e8f1ed;
+        border: 1px solid #c8ddd5;
+      }
+
+      .days-number {
+        color: var(--accent-dark);
+        font-size: clamp(72px, 23vw, 150px);
+        font-weight: 800;
+        line-height: 0.9;
+        letter-spacing: 0;
+      }
+
+      .days-label {
+        color: var(--accent-dark);
+        font-size: clamp(20px, 5vw, 30px);
+        font-weight: 700;
+        line-height: 1.15;
+      }
+
+      .time-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .time-box {
+        min-width: 0;
+        padding: 14px 8px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .time-value {
+        display: block;
+        font-size: clamp(24px, 7vw, 40px);
+        font-weight: 800;
+        line-height: 1;
+      }
+
+      .time-label {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .date-note {
+        margin: 24px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.4;
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        display: none;
+        place-items: center;
+        padding: 24px;
+        background: rgba(36, 33, 29, 0.55);
+      }
+
+      .overlay.show {
+        display: grid;
+      }
+
+      .modal {
+        width: min(100%, 420px);
+        padding: 38px 28px;
+        border-radius: 8px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+        text-align: center;
+      }
+
+      .modal h2 {
+        margin: 0 0 10px;
+        font-size: clamp(38px, 11vw, 58px);
+        line-height: 1;
+      }
+
+      .modal p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.4;
+      }
+
+      @media (max-width: 420px) {
+        body {
+          padding: 14px;
+        }
+
+        .card {
+          padding: 26px 16px;
+        }
+
+        .time-grid {
+          gap: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="card" aria-label="Moving Day countdown">
+        <h1>Moving Day Countdown</h1>
+        <p class="subtitle">Counting down to June 1, 2026.</p>
+
+        <div class="days" aria-live="polite">
+          <div class="days-number" id="days">0</div>
+          <div class="days-label">days left until you move</div>
+        </div>
+
+        <div class="time-grid" aria-label="Time remaining">
+          <div class="time-box">
+            <span class="time-value" id="hours">00</span>
+            <span class="time-label">Hours</span>
+          </div>
+          <div class="time-box">
+            <span class="time-value" id="minutes">00</span>
+            <span class="time-label">Minutes</span>
+          </div>
+          <div class="time-box">
+            <span class="time-value" id="seconds">00</span>
+            <span class="time-label">Seconds</span>
+          </div>
+        </div>
+
+        <p class="date-note">The countdown ends at 12:00 AM on June 1, 2026.</p>
+      </section>
+    </main>
+
+    <div class="overlay" id="movingDayPopup" role="dialog" aria-modal="true" aria-labelledby="movingDayTitle">
+      <div class="modal">
+        <h2 id="movingDayTitle">Moving Day!</h2>
+        <p>Today is the day. Time to move.</p>
+      </div>
+    </div>
+
+    <script>
+      const targetDate = new Date(2026, 5, 1, 0, 0, 0);
+      const dayMs = 24 * 60 * 60 * 1000;
+      const hourMs = 60 * 60 * 1000;
+      const minuteMs = 60 * 1000;
+
+      const daysEl = document.getElementById("days");
+      const hoursEl = document.getElementById("hours");
+      const minutesEl = document.getElementById("minutes");
+      const secondsEl = document.getElementById("seconds");
+      const popupEl = document.getElementById("movingDayPopup");
+
+      function pad(value) {
+        return String(value).padStart(2, "0");
+      }
+
+      function updateCountdown() {
+        const now = new Date();
+        const remaining = targetDate.getTime() - now.getTime();
+
+        if (remaining <= 0) {
+          daysEl.textContent = "0";
+          hoursEl.textContent = "00";
+          minutesEl.textContent = "00";
+          secondsEl.textContent = "00";
+          popupEl.classList.add("show");
+          document.title = "Moving Day!";
+          return;
+        }
+
+        const days = Math.ceil(remaining / dayMs);
+        const hours = Math.floor((remaining % dayMs) / hourMs);
+        const minutes = Math.floor((remaining % hourMs) / minuteMs);
+        const seconds = Math.floor((remaining % minuteMs) / 1000);
+
+        daysEl.textContent = days;
+        hoursEl.textContent = pad(hours);
+        minutesEl.textContent = pad(minutes);
+        secondsEl.textContent = pad(seconds);
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    </script>
+  </body>
+</html>
